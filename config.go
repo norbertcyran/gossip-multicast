@@ -3,10 +3,12 @@ package main
 import "github.com/BurntSushi/toml"
 
 type Config struct {
-	ListenAddr string
-	Port       int
-	Neighbours []string
-	Fanout     int
+	ListenAddr           string
+	Port                 int
+	Neighbours           []string
+	Fanout               int
+	GossipInterval       int
+	RetransmitMultiplier int
 }
 
 func readConfig(cfgPath string) (*Config, error) {

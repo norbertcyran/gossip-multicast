@@ -32,7 +32,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	gossipCfg := &gossip.Config{Transport: udp, Fanout: cfg.Fanout}
+	gossipCfg := &gossip.Config{
+		Transport:            udp,
+		Fanout:               cfg.Fanout,
+		GossipInterval:       cfg.GossipInterval,
+		RetransmitMultiplier: cfg.RetransmitMultiplier,
+		Neighbours:           cfg.Neighbours,
+	}
 	_, err = gossip.StartService(gossipCfg)
 	if err != nil {
 		panic(err)

@@ -46,12 +46,14 @@ func (t *UDPTransport) PacketCh() <-chan *Packet {
 	return t.packetCh
 }
 
-func (t *UDPTransport) WriteTo(addr net.Addr, message []byte) error {
-	n, err := t.listener.WriteTo(message, addr)
+func (t *UDPTransport) WriteTo(addr string, message []byte) error {
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Sent %d bytes\n", n)
+	if _, err = t.listener.WriteTo(message, udpAddr); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -62,11 +64,10 @@ func (t *UDPTransport) listen() {
 		if err != nil {
 			fmt.Printf("Error reading from UDP socket: %v", err)
 		}
-		fmt.Printf("Read %d bytes\n", n)
 		ts := time.Now()
 
 		t.packetCh <- &Packet{
-			Source:    addr,
+			Source:    addr.String(),
 			Content:   buf[:n],
 			Timestamp: ts,
 		}

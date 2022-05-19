@@ -51,19 +51,22 @@ func (s *Service) handlePackets() {
 	for {
 		select {
 		case packet := <-s.t.PacketCh():
-			content, err := s.mCodec.Decode(packet.Content)
-			if err != nil {
-				fmt.Printf("Invalid message format, dropping...\n")
-				continue
-			} else {
-				fmt.Printf("Received message: %q from: %q\n", string(content), packet.Source)
-			}
-			sum := md5.Sum(content)
-			enc := hex.EncodeToString(sum[:])
-			if _, ok := s.messages[enc]; !ok {
-				s.messages[enc] = &Message{
-					content:     content,
-					retransmits: 0,
+			encMsgs := bytes.Split(packet.Content, []byte(" "))
+			for _, msg := range encMsgs {
+				content, err := s.mCodec.Decode(msg)
+				if err != nil {
+					fmt.Printf("Invalid message format: %v, dropping...\n", err)
+					continue
+				} else {
+					fmt.Printf("Received message: %q from: %q\n", string(content), packet.Source)
+				}
+				sum := md5.Sum(content)
+				enc := hex.EncodeToString(sum[:])
+				if _, ok := s.messages[enc]; !ok {
+					s.messages[enc] = &Message{
+						content:     content,
+						retransmits: 0,
+					}
 				}
 			}
 		}

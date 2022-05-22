@@ -47,6 +47,7 @@ func StartService(config *Config) (*Service, error) {
 	go s.handlePackets()
 	go s.handleGossip()
 
+	s.maybeTrace(ServiceStarted)
 	return s, nil
 }
 

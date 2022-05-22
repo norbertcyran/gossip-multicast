@@ -38,6 +38,7 @@ func main() {
 		GossipInterval:       cfg.GossipInterval,
 		RetransmitMultiplier: cfg.RetransmitMultiplier,
 		Neighbours:           cfg.Neighbours,
+		Tracer:               nil,
 	}
 	_, err = gossip.StartService(gossipCfg)
 	if err != nil {

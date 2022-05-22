@@ -43,6 +43,7 @@ func StartService(config *Config) (*Service, error) {
 		neighbours:           config.Neighbours,
 		mCodec:               &B64Codec{},
 		messages:             make(map[string]*Message),
+		tracer:               config.Tracer,
 	}
 	go s.handlePackets()
 	go s.handleGossip()

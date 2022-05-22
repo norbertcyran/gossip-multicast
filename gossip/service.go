@@ -15,6 +15,7 @@ type Config struct {
 	GossipInterval       int
 	RetransmitMultiplier int
 	Neighbours           []string
+	Tracer               Tracer
 }
 
 type Service struct {
@@ -28,6 +29,8 @@ type Service struct {
 	retransmitMultiplier int
 	mLock                sync.Mutex
 	mCodec               MessageCodec
+
+	tracer Tracer
 }
 
 func StartService(config *Config) (*Service, error) {
@@ -67,6 +70,9 @@ func (s *Service) handlePackets() {
 						content:     content,
 						retransmits: 0,
 					}
+					s.maybeTrace(ReceivedMessage)
+				} else {
+					s.maybeTrace(DuplicatedMessage)
 				}
 			}
 		}
@@ -119,4 +125,10 @@ func (s *Service) generatePayload(msgs []*Message) []byte {
 		enc = append(enc, s.mCodec.Encode(msg.content))
 	}
 	return bytes.Join(enc, []byte(" "))
+}
+
+func (s *Service) maybeTrace(evt EventType) {
+	if s.tracer != nil {
+		s.tracer.Trace(evt)
+	}
 }
